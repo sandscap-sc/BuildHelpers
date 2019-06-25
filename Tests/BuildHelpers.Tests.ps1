@@ -284,9 +284,9 @@ Describe 'Get-GitChangedFile' {
             @($Output)[0] | Should BeLike "*BuildHelpers\BuildHelpers.psd1"
         }
         It "should properly apply diff filter" {
-            $Output = Get-GitChangedFile -Commit 01b3931e6ed5d3d16cbcae25fcf98d185c1375b7 -DiffFilter "M" -ErrorAction SilentlyContinue
+            $Output = Get-GitChangedFile -Commit 9a6d9191018f905d18e2cdd99eea1229b1606433 -DiffFilter "D" -ErrorAction SilentlyContinue
             @($Output).count | Should Be 1
-            @($Output)[0] | Should BeLike "*BuildHelpers\README.md"
+            @($Output)[0] | Should BeLike "*\Tests\appveyor.pester.ps1"
         }
         It "should diff a range with two commits" {
             $output = Get-GitChangedFile -LeftRevision 3e6b1f247b62e583f443be28580c1c1ee8a92db4 -RightRevision c2f4eb0838999a7c867a89a45fbe9de3f38e9ca9
