@@ -279,9 +279,9 @@ Describe 'Get-GitChangedFile' {
         }
 
         It 'Should find files changed in a specified commit in this repo' {
-            $Output = Get-GitChangedFile -Commit 01b3931e6ed5d3d16cbcae25fcf98d185c1375b7 -ErrorAction SilentlyContinue -Include README*
+            $Output = Get-GitChangedFile -Commit 01b3931e6ed5d3d16cbcae25fcf98d185c1375b7 -ErrorAction SilentlyContinue -Include BuildHelpers/BuildHelpers.psd*
             @($Output).count | Should Be 1
-            @($Output)[0] | Should BeLike "*BuildHelpers\README.md"
+            @($Output)[0] | Should BeLike "*BuildHelpers\BuildHelpers.psd1"
         }
         It "should properly apply diff filter" {
             $Output = Get-GitChangedFile -Commit 01b3931e6ed5d3d16cbcae25fcf98d185c1375b7 -DiffFilter "M" -ErrorAction SilentlyContinue
@@ -354,7 +354,9 @@ InModuleScope BuildHelpers {
 Describe 'Invoke-Git' {
     Context 'This repository' {
         It 'Should find the root of the BuildHelpers repo' {
-            Invoke-Git rev-parse --show-toplevel -Path $PSScriptRoot | Should BeLike "*BuildHelpers"
+            $output = Invoke-Git rev-parse --show-toplevel -Path $PSScriptRoot
+            $output = $output -replace "/","\"
+            $PSScriptRoot | Should BeLike ($output+"*")
         }
     }
 
