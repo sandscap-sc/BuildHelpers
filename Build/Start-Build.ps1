@@ -9,8 +9,8 @@ if(-not (Get-Module -ListAvailable PSDepend))
     & (Resolve-Path "$PSScriptRoot\helpers\Install-PSDepend.ps1")
 }
 Import-Module PSDepend
-$null = Invoke-PSDepend -Path "$PSScriptRoot\build.requirements.psd1" -Install -Import -Force
-get-module BuildHelpers
+$null = Invoke-PSDepend -Path "$PSScriptRoot\build.requirements.psd1" -Install -Import -Force -Verbose
+
 Set-BuildEnvironment
 
 Invoke-psake $PSScriptRoot\psake.ps1 -taskList $Task -nologo
