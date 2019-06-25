@@ -263,7 +263,7 @@ Describe 'Get-GitChangedFile' {
             @($Output)[0] | Should BeLike "*BuildHelpers\README.md"
         }
         It "should properly apply diff filter" {
-            $Output = Get-GitChangedFile -Commit 01b3931e6ed5d3d16cbcae25fcf98d185c1375b7 -DiffFilter "D" -ErrorAction SilentlyContinue
+            $Output = Get-GitChangedFile -Commit 9a6d9191018f905d18e2cdd99eea1229b1606433 -DiffFilter "D" -ErrorAction SilentlyContinue
             @($Output).count | Should Be 1
             @($Output)[0] | Should BeLike "*\Tests\appveyor.pester.ps1"
         }
