@@ -45,7 +45,12 @@ Task Test -Depends Init  {
             "$ProjectRoot\$TestFile" )
     }
 
-    Remove-Item "$ProjectRoot\$TestFile" -Force -ErrorAction SilentlyContinue
+    #Azure Pipelines requires the test files to stay around so they can be uploaded
+    #If you're running this locally ('Unknown') you might want the results to stick around
+    If($ENV:BHBuildSystem -notin 'Azure Pipelines','Unknown')
+    {
+        Remove-Item "$ProjectRoot\$TestFile" -Force -ErrorAction SilentlyContinue
+    }
 
     # Failed tests?
     # Need to tell psake or it will proceed to the deployment. Danger!

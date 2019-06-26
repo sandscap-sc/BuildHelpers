@@ -183,10 +183,10 @@ function Get-BuildVariable {
             break
             # Azure Pipelines Classic Build & YAML(https://docs.microsoft.com/en-us/azure/devops/pipelines/build/variables)
         }
-        'SYSTEM_DEFAULTWORKINGDIRECTORY' { #Azure Pipelines, this will be triggered in the case of a classic release pipeline
+        'AGENT_RELEASEDIRECTORY' { #Azure Pipelines, this will be triggered in the case of a classic release pipeline
             if($WeCanGit)
             {
-                (Invoke-Git @IGParams -Arguments "log --format=%B -n 1 $( (Get-Item -Path "ENV:$_").Value )").split([Environment]::NewLine,[System.StringSplitOptions]::RemoveEmptyEntries) -join " "
+                (Invoke-Git @IGParams -Arguments "log --format=%B -n 1 $( (Get-Item -Path "ENV:BUILD_SOURCEVERSION").Value )").split([Environment]::NewLine,[System.StringSplitOptions]::RemoveEmptyEntries) -join " "
                 break
             } # Azure Pipelines Classic Release (https://docs.microsoft.com/en-us/azure/devops/pipelines/release/variables)
         }
@@ -243,7 +243,7 @@ function Get-BuildVariable {
     {
         if($WeCanGit)
         {
-            $CommitMessage = Invoke-Git @IGParams -Arguments "log --format=%H -n 1"
+            $CommitHash = Invoke-Git @IGParams -Arguments "log --format=%H -n 1"
         }        
     }
     # Build number
@@ -263,7 +263,20 @@ function Get-BuildVariable {
         $BuildNumber = 0
     }
 
-    [pscustomobject]@{
+    $PullRequest = switch ($BuildSystem)
+    {
+        'AppVeyor'        {if ($Environment.APPVEYOR_PULL_REQUEST_NUMBER) {"True"}; break}
+        'GitLab CI'       {if ($Environment.CI_MERGE_REQUEST_ID) {"True"}; break}
+        'Azure Pipelines' {if ($ENV:BUILD_REASON -eq "PullRequest") {"True"}; break}
+        'Bamboo'          {if ($Environment.bamboo.repository.pr.key) {"True"}; break}
+        'GoCD'            {if ($Environment.PR_TITLE) {"True"}; break}
+        'Travis CI'       {if ($ENV:TRAVIS_EVENT_TYPE -eq "pull_request") {"True"}; break}
+        'GitHub Actions'  {if ($ENV:GITHUB_EVENT_NAME -eq "pull_request") {"True"}; break}
+        #'Jenkins' {if ($Environment.CHANGE_ID) {"True"}} ???? is this correct?
+        #'Teamcity' {if ???????) {"True"}} who even knows
+    }
+
+    $ReturnHash = @{
         BuildSystem = $BuildSystem
         ProjectPath = $BuildRoot
         BranchName = $BuildBranch
@@ -271,4 +284,10 @@ function Get-BuildVariable {
         CommitHash = $CommitHash
         BuildNumber = $BuildNumber
     }
+    if ($PullRequest) {
+        $ReturnHash['IsPullRequest'] = $PullRequest
+    }
+
+    [PSCustomObject]$ReturnHash
+
 }

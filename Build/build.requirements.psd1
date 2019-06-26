@@ -15,7 +15,7 @@
     }
     'BuildHelpers' = @{
         DependencyType = 'PSGalleryNuget'
-        Version = '0.0.57'
+        Version = '2.0.9'
     }
     'Pester' = @{
         DependencyType = 'PSGalleryNuget'
